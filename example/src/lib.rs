@@ -145,17 +145,15 @@ impl Plugin for Gain {
                             }
                         }
                         WebviewEvent::FileDropped(path) => println!("File dropped: {:?}", path),
+                        WebviewEvent::ParamValueChanged(param, normalized_value) => {
+                            let _ = ctx.send_json(json!({
+                                "type": "param_change",
+                                "param": param,
+                                "value": normalized_value,
+                            }));
+                        }
                         _ => {}
                     }
-                }
-
-                if gain_value_changed.swap(false, Ordering::Relaxed) {
-                    let _ = ctx.send_json(json!({
-                        "type": "param_change",
-                        "param": "gain",
-                        "value": params.gain.unmodulated_normalized_value(),
-                        "text": params.gain.to_string()
-                    }));
                 }
             });
 

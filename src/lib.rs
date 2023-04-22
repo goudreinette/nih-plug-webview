@@ -36,6 +36,8 @@ pub enum WebviewEvent {
     FileHovered(Vec<PathBuf>),
     FileDropped(Vec<PathBuf>),
     FileDropCancelled,
+    ParamValuesChanged,
+    ParamValueChanged(String, f32),
 }
 
 pub struct Context {
@@ -236,9 +238,15 @@ impl Editor for WebViewEditor {
         return false;
     }
 
-    fn param_values_changed(&self) {}
+    fn param_values_changed(&self) {
+        let mut context = self.context.lock();
+        context.events.push_back(WebviewEvent::ParamValuesChanged);
+    }
 
-    fn param_value_changed(&self, _id: &str, _normalized_value: f32) {}
+    fn param_value_changed(&self, _id: &str, _normalized_value: f32) {
+        let mut context = self.context.lock();
+        context.events.push_back(WebviewEvent::ParamValueChanged(_id.to_owned(), _normalized_value));
+    }
 
     fn param_modulation_changed(&self, _id: &str, _modulation_offset: f32) {}
 }
